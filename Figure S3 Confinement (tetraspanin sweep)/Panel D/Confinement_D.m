@@ -1,0 +1,245 @@
+close all;
+clear all;
+clc;
+
+% Confinement figure 1, panel 3
+%--------------------------------------------%
+
+% define the Localized model equations
+R_func = @(kp,kbi,kT,kL,kT_neg,kLT,kL_neg,kc,kc_neg,ki) kp ./(kbi + kT + kL - ((kT_neg.*kT)./(kT_neg+kLT)) + ((kL_neg .*(((kLT.*kT) ./ (kT_neg+kLT)) +kL) ./ (((kc.*kc_neg) ./ (kc_neg+ki)) -kL_neg - kc))));
+T_func = @(R,kT,kT_neg,kLT) (kT.*R) ./ (kT_neg+kLT);
+RL_func = @(R,kT,kT_neg, kLT,kL,kL_neg,ki,kc,kc_neg) -R.*(((kLT.*kT) ./ (kT_neg+kLT)) +kL)./ (((kc.*kc_neg) ./ (kc_neg+ki)) -kL_neg - kc);
+Rc_func = @(kc,kc_neg,ki,RL) (kc.*RL) ./(kc_neg+ki);
+
+clear kp kT kT_neg kc kc_neg ki kLT kL_neg kbi kL;
+
+kp = 1;
+kT = (1/30)*12;
+kT_neg = 0.12/10; 
+kc =  0.1;
+kc_neg = 0.05;  
+ki = 0.05;
+kLT = logspace(-5,1,50); 
+kL_neg = 0.05; 
+kbi = 1*(3*10^-4); 
+kL = 0.1*kLT;
+
+kT0 = kT;
+kT_neg0 = kT_neg;
+kc0 = kc;
+kc_neg0 = kc_neg;
+ki0 = ki;
+kL_neg0 = kL_neg;
+kbi0 = kbi;
+
+
+figure(1)
+
+clear kLT kL;
+
+kLT = 0.1;
+kL = 0.1*kLT;
+
+% clear kT
+% kT = kT0*logspace(-2,2,51);
+% 
+% R = R_func(kp,kbi,kT,kL,kT_neg,kLT,kL_neg,kc,kc_neg,ki);
+% T = T_func(R,kT,kT_neg,kLT);
+% RL = RL_func(R,kT,kT_neg, kLT,kL,kL_neg,ki,kc,kc_neg);
+% Rc = Rc_func(kc,kc_neg,ki,RL);
+% 
+% semilogx(kT/kT0,(T+Rc)./(R+T+RL+Rc),'--','color',[1 0.5 0],'linewidth',5);
+% hold on
+% 
+% clear kT
+% kT = kT0;
+% 
+% %
+% 
+% clear kT_neg
+% kT_neg = kT_neg0*logspace(-2,2,51);
+% R = R_func(kp,kbi,kT,kL,kT_neg,kLT,kL_neg,kc,kc_neg,ki);
+% T = T_func(R,kT,kT_neg,kLT);
+% RL = RL_func(R,kT,kT_neg, kLT,kL,kL_neg,ki,kc,kc_neg);
+% Rc = Rc_func(kc,kc_neg,ki,RL);
+% 
+% semilogx(kT_neg/kT_neg0,(T+Rc)./(R+T+RL+Rc),'--','color',[0.5 0.5 0.5],'linewidth',5);
+% 
+% clear kT_neg
+% kT_neg = kT_neg0;
+
+
+
+clear kc
+kc = kc0*logspace(-2,2,51);
+R = R_func(kp,kbi,kT,kL,kT_neg,kLT,kL_neg,kc,kc_neg,ki);
+T = T_func(R,kT,kT_neg,kLT);
+RL = RL_func(R,kT,kT_neg, kLT,kL,kL_neg,ki,kc,kc_neg);
+Rc = Rc_func(kc,kc_neg,ki,RL);
+
+semilogx(kc/kc0,(T+Rc)./(R+T+RL+Rc),'--','color',[0.5210 0.0860 0.8190],'linewidth',5);
+hold on
+
+X1 = kc/kc0;
+Y1 = (T+Rc)./(R+T+RL+Rc);
+Localized_data1 = [X1(:), Y1(:)];
+% Save as a tab-delimited text file with headers
+header = {'kc/kc0', 'Confinement fraction'};
+writetable(array2table(Localized_data1, 'VariableNames', header), 'kc.txt', 'Delimiter', '\t');
+
+
+clear kc
+kc = kc0;
+
+%
+
+clear kc_neg
+kc_neg = kc_neg0*logspace(-2,2,51);
+R = R_func(kp,kbi,kT,kL,kT_neg,kLT,kL_neg,kc,kc_neg,ki);
+T = T_func(R,kT,kT_neg,kLT);
+RL = RL_func(R,kT,kT_neg, kLT,kL,kL_neg,ki,kc,kc_neg);
+Rc = Rc_func(kc,kc_neg,ki,RL);
+
+semilogx(kc_neg/kc_neg0,(T+Rc)./(R+T+RL+Rc),'--','color',[0 0.5 0.],'linewidth',5);
+
+X2 = kc_neg/kc_neg0;
+Y2 = (T+Rc)./(R+T+RL+Rc);
+Localized_data2 = [X2(:), Y2(:)];
+% Save as a tab-delimited text file with headers
+header = {'kc_neg/kc_neg0', 'Confinement fraction'};
+writetable(array2table(Localized_data2, 'VariableNames', header), 'kc_neg.txt', 'Delimiter', '\t');
+
+
+clear kc_neg
+kc_neg = kc_neg0;
+
+%
+
+clear ki
+ki = ki0*logspace(-2,2,51);
+R = R_func(kp,kbi,kT,kL,kT_neg,kLT,kL_neg,kc,kc_neg,ki);
+T = T_func(R,kT,kT_neg,kLT);
+RL = RL_func(R,kT,kT_neg, kLT,kL,kL_neg,ki,kc,kc_neg);
+Rc = Rc_func(kc,kc_neg,ki,RL);
+
+semilogx(ki/ki0,(T+Rc)./(R+T+RL+Rc),'m--','linewidth',5);
+
+X3 = ki/ki0;
+Y3 = (T+Rc)./(R+T+RL+Rc);
+Localized_data3 = [X3(:), Y3(:)];
+% Save as a tab-delimited text file with headers
+header = {'ki/ki0', 'Confinement fraction'};
+writetable(array2table(Localized_data3, 'VariableNames', header), 'ki.txt', 'Delimiter', '\t');
+
+clear ki
+ki = ki0;
+
+%
+
+clear kL_neg
+kL_neg = kL_neg0*logspace(-2,2,51);
+R = R_func(kp,kbi,kT,kL,kT_neg,kLT,kL_neg,kc,kc_neg,ki);
+T = T_func(R,kT,kT_neg,kLT);
+RL = RL_func(R,kT,kT_neg, kLT,kL,kL_neg,ki,kc,kc_neg);
+Rc = Rc_func(kc,kc_neg,ki,RL);
+
+semilogx(kL_neg/kL_neg0,(T+Rc)./(R+T+RL+Rc),'--','color',[0, 0.8078, 0.8235],'linewidth',5);
+
+X5 = kL_neg/kL_neg0;
+Y5 = (T+Rc)./(R+T+RL+Rc);
+Localized_data5 = [X5(:), Y5(:)];
+% Save as a tab-delimited text file with headers
+header = {'kL_neg/kL_neg0', 'Confinement fraction'};
+writetable(array2table(Localized_data5, 'VariableNames', header), 'kL_neg.txt', 'Delimiter', '\t');
+
+
+clear kL_neg
+kL_neg = kL_neg0;
+
+%
+
+clear kbi
+kbi = kbi0*logspace(-2,2,51);
+R = R_func(kp,kbi,kT,kL,kT_neg,kLT,kL_neg,kc,kc_neg,ki);
+T = T_func(R,kT,kT_neg,kLT);
+RL = RL_func(R,kT,kT_neg, kLT,kL,kL_neg,ki,kc,kc_neg);
+Rc = Rc_func(kc,kc_neg,ki,RL);
+
+semilogx(kbi/kbi0,(T+Rc)./(R+T+RL+Rc),'--','color',[0.6 0.4 0.2],'linewidth',5);
+
+X4 = kbi/kbi0;
+Y4 = (T+Rc)./(R+T+RL+Rc);
+Localized_data4 = [X4(:), Y4(:)];
+% Save as a tab-delimited text file with headers
+header = {'kbi/kbi0', 'Confinement fraction'};
+writetable(array2table(Localized_data4, 'VariableNames', header), 'kbi.txt', 'Delimiter', '\t');
+
+
+clear kbi
+kbi = kbi0;
+
+set(gca','fontsize',28)
+xlabel('k/k_0','FontSize',30);
+ylabel('Confined EGFR fraction','FontSize',30);
+set(gcf,'Color','white')
+axis tight
+ylim([0 1])
+xticks([10^-2 10^-1 10^0 10^1 10^2])
+
+%legend('k_{+T}','k_{-T}','k_{+c}','k_{-c}',...
+%    'k_{i}','k_{-L}','k_{bi}',orientation = 'horizontal',Fontsize = 16,location = 'north');
+
+%legend('boxoff') 
+box off
+
+% Plot colours
+% Default uniform params will be blue and default localized will be red
+% kT = Orange [1 0.5 0]
+% kT_neg = gray [0.5 0.5 0.5]
+% kc = purple [0.5210 0.0860 0.8190]
+% kc_neg = green [0 0.5 0] 
+% kL_neg = cyan [0, 0.8078, 0.8235]
+% ki = magenta
+% kbi = brown
+
+
+
+% Make additional text for legend
+%annotation('textbox', [0.205 0.5 0.15 0.05], 'String', 'k_{+T}', 'Color',[1 0.5 0],...
+%           'LineStyle', 'none','FontSize', 30);
+
+% Make additional text for legend
+%annotation('textbox', [0.205 0.5 0.15 0.05], 'String', 'k_{-T}', 'Color',[0.5 0.5 0.5],...
+%           'LineStyle', 'none','FontSize', 30);
+
+% annotation('textbox', [0.205 0.5 0.15 0.05], 'String', 'k_{+c}', 'Color',[0.5210 0.0860 0.8190],...
+%            'LineStyle', 'none','FontSize', 20);
+% 
+% % Make additional text for legend
+% annotation('textbox', [0.205 0.5 0.15 0.05], 'String', 'k_{-c} = k_{+c0}', 'Color',[0 0.5 0],...
+%            'LineStyle', 'none','FontSize', 20);
+% 
+% annotation('textbox', [0.205 0.5 0.15 0.05], 'String', 'k_{-L}', 'Color',[0, 0.8078, 0.8235],...
+%            'LineStyle', 'none','FontSize', 20);
+% 
+% % Make additional text for legend
+% annotation('textbox', [0.205 0.5 0.15 0.05], 'String', 'k_{i}', 'Color','m',...
+%            'LineStyle', 'none','FontSize', 20);
+% 
+% annotation('textbox', [0.205 0.5 0.15 0.05], 'String', 'k_{bi}', 'Color',[0.6 0.4 0.2],...
+%            'LineStyle', 'none','FontSize', 20);
+
+
+% % Line 1 (solid)
+% % Making line
+% annotation('line', [0.15 0.2], [0.85 0.85], 'LineWidth', 3, 'Color', 'k');
+% % Making text
+% annotation('textbox', [0.205 0.825 0.15 0.05], 'String', 'Uniform model', ...
+%            'LineStyle', 'none', 'VerticalAlignment', 'middle','FontSize', 20);
+
+% Line 2 (dashed)
+% Making line
+%annotation('line', [0.15 0.2], [0.8 0.8], 'LineWidth', 3, 'LineStyle', '--', 'Color', 'k');
+% Making text
+%annotation('textbox', [0.205 0.775 0.15 0.05], 'String', 'Localized model', ...
+%           'LineStyle', 'none', 'VerticalAlignment', 'middle','FontSize', 30);
