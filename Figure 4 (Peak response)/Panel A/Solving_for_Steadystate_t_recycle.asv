@@ -1,0 +1,33 @@
+function [R0, T0, RL0, Rc0, Rw0] = Solving_for_Steadystate_t_recycle(kp,kLT,kT,kT_neg,kc,kc_neg,ki,kbi,kL,kL_neg,p,kr,Rw)
+
+% Tetraspanin model
+%kLT = 0;
+%kL = 0;
+
+% Equation [5] 
+R0 = kp / ((kbi+kT+kL - ((kT_neg*kT)/(kT_neg+kLT)) -kr*((p*(ki/kr)*((kc*(-((kLT*kT)/(kT_neg+kLT) + kL)) / ((kc_neg*kc)/(kc_neg+ki) - kL_neg - kc))) / (kc_neg+ki)))) + ((kL_neg*(((kLT*kT)/(kT_neg+kLT)) +kL))/(((kc_neg*kc)/(kc_neg+ki)) - kL_neg -kc)));
+
+% Equation [6]
+T0 = (kT*R0)/(kT_neg+kLT); %same as before
+
+%Equation [7]
+RL0 = (-R0*((kLT*kT)/(kT_neg+kLT) + kL)) / ((kc_neg*kc)/(kc_neg+ki) - kL_neg - kc);
+
+% Equation [8]
+Rc0 = (kc*RL0) / (kc_neg+ki); % p cancel in denom and we get the same SS
+
+% Recycling state
+Rw0 = (p*(ki/kr)*((kc*RL0) / (kc_neg+ki))); % p*ki/kr *Rc
+
+
+
+
+
+
+
+
+
+
+
+
+
